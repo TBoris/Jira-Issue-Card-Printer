@@ -18,27 +18,6 @@
   //cors = "https://cors-anywhere.herokuapp.com/";
   //$("#card").load("https://cors-anywhere.herokuapp.com/"+"https://qoomon.github.io/Jira-Issue-Card-Printer/card.html");
 
-  // <GoogleAnalytics>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-50840116-3', {'alwaysSendReferrer': true});
-  if(isTest || isDev){
-    ga('set', 'page', '/dev/cardprinter');
-  } else {
-    ga('set', 'page', '/cardprinter');
-  }
-
-  //ga('set', 'referrer', window.location.hostname);
-  //ga('set', 'location', window.location.protocol + '//' + window.location.host + window.location.pathname);
-  //ga('set', 'hostname', window.location.hostname);
-  //ga('set', 'title', document.title);
-
-  //ga('set', 'campaignSource', '(direct)');
-  //ga('set', 'campaignMedium', '(none)');
-  // </GoogleAnalytics>
 
   try {
 
@@ -84,7 +63,6 @@
       jQuery("body").append(printOverlayHTML);
       jQuery("#card-print-overlay").prepend(printOverlayStyle);
 
-      ga('send', 'pageview');
 
       jQuery("#card-print-dialog-title").text("Card Print   -   Loading " + issueKeyList.length + " issues...");
       renderCards(issueKeyList, function(){
@@ -97,7 +75,6 @@
       var printFrame = jQuery("#card-print-dialog-content-iframe");
       var printWindow = printFrame[0].contentWindow;
       var printDocument = printWindow.document;
-      ga('send', 'event', 'button', 'click', 'print', jQuery(".card", printDocument).length );
       printWindow.print();
     }
 
@@ -182,7 +159,6 @@
       console.logDebug("type: " + type);
       card.find(".card").attr("type", type);
 
-      ga('send', 'event', 'task', 'generate', 'card', type );
 
       //Summary
       var summary = data.fields.summary;
@@ -1071,9 +1047,5 @@
 
   } catch (err) {
     console.logError(err.message);
-    ga('send', 'exception', {
-      'exDescription': err.message,
-      'exFatal': true
-    });
   };
 })();
