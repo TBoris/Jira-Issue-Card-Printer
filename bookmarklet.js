@@ -189,6 +189,9 @@
 
       //Story Points
       var storyPoints = data.fields.storyPoints;
+        if (!storyPoints) {
+            storyPoints = jQuery('div[data-issue-key="' + key + '"] span[title="Story Points"]').text();
+        }
       console.logDebug("storyPoints: " + storyPoints);
       if (storyPoints) {
         card.find(".estimate").text(storyPoints);
@@ -558,7 +561,6 @@
       <div class="card-header">
         <div class="type-icon badge circular"></div>
         <div class="key badge"></div>
-        <div class="estimate badge circular " contenteditable="true"></div>
         <div class="due">
           <div class="due-icon badge circular "></div>
           <div class="due-date badge" contenteditable="true"></div>
@@ -571,7 +573,7 @@
         <div class="description" contenteditable="true"></div>
       </div>
       <div class="card-footer">
-        <div class="assignee badge "></div>
+         <div class="estimate badge circular " contenteditable="true"></div>
         <div class="epic badge">
           <span class="epic-key"></span>
           <span class="epic-name" contenteditable="true"></span>
@@ -691,7 +693,7 @@
         width: auto;
         min-width: 4.4cm;
         height: 1.55cm;
-        left: 3.0cm;
+        left: 2.8cm;
         margin-top: 1.2cm;
         padding-left: 0.7cm;
         padding-right: 0.4cm;
@@ -729,20 +731,16 @@
          background-image: url(https://googledrive.com/host/0Bwgd0mVaLU_KU0N5b3JyRnJaNTA/resources/icons/LoadingCloud.png);
     }
 
-    .estimate {
-        position: relative;
-        float: left;
-        left: -0.65cm;
-        top:-1.5cm;
-        height: 1.1cm;
-        width: 1.1cm;
-        text-align: center;
-        font-weight: bold;
-        font-size: 1cm;
-        line-height: 1.15cm;
-        margin-top:1.5cm;
-        z-index: 999;
-    }
+     .estimate {
+         position: relative;
+         float: right;
+         width: 2.1cm;
+         height: 2.1cm;
+         top: -1.0cm;
+         text-align: center;
+         font-weight: bold;
+         font-size: 1.8cm;
+     }
 
     .due {
         position: relative;
