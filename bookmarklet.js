@@ -2,7 +2,8 @@
   var version = "3.1.21";
   console.log("Version: " + version);
 
-  var isDev = typeof isDev !== 'undefined' && isDev ;
+//  var isDev = typeof isDev !== 'undefined' && isDev ;
+    var isDev = True;
   var isTest = typeof isTest !== 'undefined' && isTest ;
 
   var hostOrigin = "https://qoomon.github.io/Jira-Issue-Card-Printer/";
@@ -188,11 +189,6 @@
       console.logDebug("summary: " + summary);
       card.find('.summary').text(summary);
 
-      //Description
-      var description = data.renderedFields.description;
-      console.logDebug("description: " + description);
-      card.find('.description').html(description);
-
       //Assignee
       var assignee = data.fields.assignee;
       console.logDebug("assignee: " + assignee);
@@ -314,7 +310,7 @@
         });
       }
 
-    
+
 
     //############################################################################################################################
     //############################################################################################################################
@@ -353,7 +349,7 @@
 
       result.find("#report-issue")
       .click(function(event){
-        window.open('https://github.com/qoomon/Jira-Issue-Card-Printer/issues');
+        window.open('https://github.com/tboris/Jira-Issue-Card-Printer/issues');
         return false;
       });
 
