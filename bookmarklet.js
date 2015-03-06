@@ -3,7 +3,7 @@
   console.log("Version: " + version);
 
 //  var isDev = typeof isDev !== 'undefined' && isDev ;
-    var isDev = True;
+    var isDev = true;
   var isTest = typeof isTest !== 'undefined' && isTest ;
 
   var hostOrigin = "https://qoomon.github.io/Jira-Issue-Card-Printer/";
