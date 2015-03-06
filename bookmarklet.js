@@ -193,14 +193,10 @@
       var assignee = data.fields.assignee;
       console.logDebug("assignee: " + assignee);
       if ( assignee ) {
-        var avatarUrl = assignee.avatarUrls['48x48'];
-        if(avatarUrl.indexOf("ownerId=") < 0){
           var displayName = assignee.displayName;
-          card.find(".assignee").text(displayName[0]);
-        }
-        else {
-          card.find(".assignee").css("background-image", "url('" + avatarUrl + "')");
-        }
+          card.find(".assignee").text(
+              displayName.split(' ').map(function(arg){return arg[0] + '.'}).join(' ')
+          );
       } else {
         card.find(".assignee").addClass("hidden");
       }
@@ -213,22 +209,6 @@
         card.find(".due-date").text(renderedDuedate);
       } else {
         card.find(".due").addClass("hidden");
-      }
-
-      //Attachment
-      var hasAttachment = false;
-      var indexOfPrintScopeDeviderToken =  description.indexOf(printScopeDeviderToken);
-      if (indexOfPrintScopeDeviderToken >= 0) {
-        var descriptionWithoutAttachment = description.substring(0, indexOfPrintScopeDeviderToken);
-        card.find('.description').html(descriptionWithoutAttachment);
-        hasAttachment = true;
-      } else if (data.fields.attachment.length > 0) {
-        hasAttachment = true;
-      }
-      console.logDebug("hasAttachment: " + hasAttachment);
-      if ( hasAttachment ) {
-      } else{
-        card.find('.attachment').addClass('hidden');
       }
 
       //Story Points
@@ -583,7 +563,6 @@
       .html(multilineString(function() {
     /*!
     <div class="card">
-      <div class="author">Bengt Brodersen - qoomon.com</div>
       <div class="card-border"></div>
       <div class="card-header">
         <div class="type-icon badge circular"></div>
@@ -601,9 +580,7 @@
         <div class="description" contenteditable="true"></div>
       </div>
       <div class="card-footer">
-        <div class="assignee badge circular"></div>
-        <div class="qr-code badge"></div>
-        <div class="attachment badge circular"></div>
+        <div class="assignee badge "></div>
         <div class="epic badge">
           <span class="epic-key"></span>
           <span class="epic-name" contenteditable="true"></span>
@@ -659,7 +636,7 @@
     .badge {
         width: 3.2cm;
         height: 3.2cm;
-        background: #d0d0d0;
+        background: #f0f0f0;
     }
 
     .card {
@@ -824,12 +801,12 @@
     .assignee {
         position: relative;
         float: right;
-        width: 2.1cm;
+        width: 3.1cm;
         height: 2.1cm;
         text-align: center;
         font-weight: bold;
-        font-size: 1.8cm;
-        line-height: 2.5cm;
+        font-size: 1.2cm;
+        line-height: 1.5cm;
         background-image: url(https://images.weserv.nl/?url=www.iconsdb.com/icons/download/color/aaaaaa/contacts-256.png);
         background-repeat: no-repeat;
         -webkit-background-size: cover;
