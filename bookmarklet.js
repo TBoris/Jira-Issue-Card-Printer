@@ -40,7 +40,7 @@
 
       printScopeDeviderToken = "<b>Attachment</b>";
 
-      console.logLevel = console.INFO;
+      console.logLevel = console.DEBUG;
 
       resourceOrigin = hostOrigin+ "resources/";
     }
@@ -214,6 +214,21 @@
       var qrCodeImageUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=256x256&chld=L|1&chl=' + window.location.origin + "/browse/" + key;
       console.logTrace("qrCodeImageUrl: " + qrCodeImageUrl);
       card.find(".qr-code").css("background-image", "url('" + qrCodeImageUrl + "')");
+
+
+        // Priority and Severity
+        var priority = data.fields.priority;
+        var severity = data.fields.severity;
+        var description = '';
+        if ( priority && priority.name) {
+            description = 'Priority: ' + priority.name;
+        }
+        if ( severity ) {
+            severity = severity.value.split('>')[1].split('<')[0];
+            description = description + '<br> Severity: ' + severity;
+        }
+        console.logDebug("description: " + description);
+        card.find(".description").html(description);
 
       //handle Site specifics
       switch (window.location.hostname) {
@@ -598,8 +613,8 @@
         border-color: #2f2f2f;
         border-top-width: 0.14cm;
         border-left-width: 0.14cm;
-        border-bottom-width: 0.24cm;
-        border-right-width: 0.24cm;
+        border-bottom-width: 0.14cm;
+        border-right-width: 0.14cm;
         -webkit-border-radius: 0.25cm;
         border-radius: 0.25cm;
         // -webkit-filter: drop-shadow(0px 5px 10px black)
@@ -655,7 +670,7 @@
     .content-header {
         position: relative;
         font-size: 1.1cm;
-        line-height: 1.1cm;
+        line-height: 1.5cm;
         margin-bottom: 0.6cm;
     }
     .card-footer {
@@ -667,22 +682,22 @@
     }
     .description {
         min-height: 3.0cm;
-        font-size: 0.6cm;
-        line-height: 0.6cm;
+        font-size: 0.8cm;
+        line-height: 1.9cm;
     }
     .key {
         position: absolute;
         float: left;
         width: auto;
         min-width: 4.4cm;
-        height: 1.35cm;
+        height: 1.55cm;
         left: 3.0cm;
         margin-top: 1.2cm;
         padding-left: 0.7cm;
         padding-right: 0.4cm;
         text-align: center;
         font-weight: bold;
-        font-size: 1.0cm;
+        font-size: 1.5cm;
         line-height: 1.6cm;
     }
     .type-icon {
@@ -697,7 +712,7 @@
         z-index: 1;
     }
 
-    .card[type="story"] .type-icon {
+    .card[type="user story"] .type-icon {
         background-color: GOLD;
         background-image: url(https://googledrive.com/host/0Bwgd0mVaLU_KU0N5b3JyRnJaNTA/resources/icons/Bulb.png);
     }
@@ -708,6 +723,10 @@
     .card[type="epic"] .type-icon {
         background-color: ROYALBLUE;
         background-image: url(https://googledrive.com/host/0Bwgd0mVaLU_KU0N5b3JyRnJaNTA/resources/icons/Flash.png);
+    }
+    .card[type="improvement"] .type-icon{
+        background-color: WHITE;
+         background-image: url(https://googledrive.com/host/0Bwgd0mVaLU_KU0N5b3JyRnJaNTA/resources/icons/LoadingCloud.png);
     }
 
     .estimate {
