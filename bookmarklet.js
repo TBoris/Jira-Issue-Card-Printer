@@ -1,10 +1,10 @@
 (function () {
   var version = "3.1.21";
   console.log("Version: " + version);
-  
+
   var isDev = typeof isDev !== 'undefined' && isDev ;
   var isTest = typeof isTest !== 'undefined' && isTest ;
-  
+
   var hostOrigin = "https://qoomon.github.io/Jira-Issue-Card-Printer/";
   if(isDev){
     console.log("DEVELOPMENT");
@@ -13,10 +13,10 @@
   if(isTest){
     console.log("TEST");
   }
-  
+
   //cors = "https://cors-anywhere.herokuapp.com/";
   //$("#card").load("https://cors-anywhere.herokuapp.com/"+"https://qoomon.github.io/Jira-Issue-Card-Printer/card.html");
-    
+
   // <GoogleAnalytics>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -29,69 +29,69 @@
   } else {
     ga('set', 'page', '/cardprinter');
   }
-  
+
   //ga('set', 'referrer', window.location.hostname);
   //ga('set', 'location', window.location.protocol + '//' + window.location.host + window.location.pathname);
   //ga('set', 'hostname', window.location.hostname);
   //ga('set', 'title', document.title);
-  
+
   //ga('set', 'campaignSource', '(direct)');
   //ga('set', 'campaignMedium', '(none)');
   // </GoogleAnalytics>
-  
+
   try {
-    
+
     // load jQuery
     if (window.jQuery === undefined) {
       appendScript('//ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js');
     }
-    
+
     // wait untill all scripts loaded
     appendScript('https://qoomon.github.io/void', function(){
       init();
       main();
     });
-    
+
     function init(){
       addJQueryFunctions();
       addConsoleFunctions();
       addStringFunctions();
       addDateFunctions();
-    
+
       printScopeDeviderToken = "<b>Attachment</b>";
-    
+
       console.logLevel = console.INFO;
-      
+
       resourceOrigin = hostOrigin+ "resources/";
     }
-    
+
     function main(){
       //preconditions
       if(jQuery("#card-print-overlay").length > 0){
         alert("Print Card already opened!");
         return;
       }
-      
+
       var issueKeyList = getSelectedIssueKeyList();
-      
+
       if(issueKeyList.length <= 0){
         alert("Please select at least one issue.");
         return;
       }
-      
+
       // open print preview
       jQuery("body").append(printOverlayHTML);
       jQuery("#card-print-overlay").prepend(printOverlayStyle);
-      
+
       ga('send', 'pageview');
-    
+
       jQuery("#card-print-dialog-title").text("Card Print   -   Loading " + issueKeyList.length + " issues...");
       renderCards(issueKeyList, function(){
         jQuery("#card-print-dialog-title").text("Card Print");
         //print();
       });
     }
-    
+
     function print(){
       var printFrame = jQuery("#card-print-dialog-content-iframe");
       var printWindow = printFrame[0].contentWindow;
@@ -99,23 +99,23 @@
       ga('send', 'event', 'button', 'click', 'print', jQuery(".card", printDocument).length );
       printWindow.print();
     }
-    
+
     function renderCards(issueKeyList, callback) {
-    
+
       var printFrame = jQuery("#card-print-dialog-content-iframe");
       var printWindow = printFrame[0].contentWindow;
       var printDocument = printWindow.document;
-    
+
       printDocument.open();
       printDocument.write("<head/><body/>");
-    
+
       jQuery("head", printDocument).append(printPanelPageCSS());
       jQuery("head", printDocument).append(printPanelCardCSS());
-    
+
       console.logInfo("load " + issueKeyList.length + " issues...");
-    
+
       var deferredList = [];
-    
+
       issueKeyList.each(function(position, issueKey) {
         var page = newPage(issueKey);
         page.hide();
@@ -130,7 +130,7 @@
         });
       });
       console.logInfo("wait for issues loaded...");
-    
+
       applyDeferred(deferredList,function() {
         console.logInfo("...all issues loaded.");
         jQuery(printWindow).load(function(){
@@ -141,15 +141,15 @@
         console.logInfo("wait for resources loaded...");
       });
     }
-    
+
     function closePrintPreview(){
       jQuery("#card-print-overlay").remove();
       jQuery("#card-print-overlay-style").remove();
     }
-    
-    
+
+
     function getSelectedIssueKeyList() {
-    
+
       //JIRA
       if (jQuery("meta[name='application-name'][ content='JIRA']").length > 0) {
         //Browse
@@ -158,7 +158,7 @@
             return jQuery(this).attr('data-issue-key');
           });
         }
-    
+
         // RapidBoard
         if (/.*\/secure\/RapidBoard.jspa.*/g.test(document.URL)) {
           return jQuery('div[data-issue-key].ghx-selected').map(function() {
@@ -166,33 +166,33 @@
           });
         }
       }
-    
+
       return [];
     }
-    
+
     function fillCardWithJSONData(card, data) {
       //Key
       var key = data.key;
       console.logDebug("key: " + key);
       card.find('.key').text(key);
-    
+
       //Type
       var type = data.fields.issuetype.name.toLowerCase();
       console.logDebug("type: " + type);
       card.find(".card").attr("type", type);
-      
+
       ga('send', 'event', 'task', 'generate', 'card', type );
-    
+
       //Summary
       var summary = data.fields.summary;
       console.logDebug("summary: " + summary);
       card.find('.summary').text(summary);
-    
+
       //Description
       var description = data.renderedFields.description;
       console.logDebug("description: " + description);
       card.find('.description').html(description);
-    
+
       //Assignee
       var assignee = data.fields.assignee;
       console.logDebug("assignee: " + assignee);
@@ -208,7 +208,7 @@
       } else {
         card.find(".assignee").addClass("hidden");
       }
-    
+
       //Due-Date
       var duedate = data.fields.duedate;
       console.logDebug("duedate: " + duedate);
@@ -218,80 +218,7 @@
       } else {
         card.find(".due").addClass("hidden");
       }
-<<<<<<< HEAD
-    }
-  
-  
-    function loadCardDataJSON(issueKey, callback) {
-  
-      //https://docs.atlassian.com/jira/REST/latest/
-      var url = '/rest/api/2/issue/' + issueKey + '?expand=renderedFields,names';
-      console.logDebug("IssueUrl: " + window.location.hostname + url);
-      console.logDebug("Issue: " + issueKey + " Loading...");
-      return  jQuery.ajax({
-        type: 'GET',
-        url: url,
-        dataType: 'json',
-        success: function(responseData){
-          fields = responseData.fields;
-          // add custom fields with field names
-          jQuery.each(responseData.names, function(key, value) {
-            if(key.startsWith("customfield_")){
-              var newFieldId = value.toCamelCase();
-              console.logTrace("add new field: " + newFieldId +" with value from "+ key);
-              fields[value.toCamelCase()] = fields[key];
-            }
-          });
-          console.logDebug("Issue: " + issueKey + " Loaded!");
-          callback(responseData);
-        },
-        data: {},
-      });
-    }
-  
-  
-  
-  //############################################################################################################################
-  //############################################################################################################################
-  //############################################################################################################################
-  
-  
-  // http://www.cssdesk.com/T9hXg
-  
-  function printOverlayHTML(){
-  
-  
-    var result = jQuery(document.createElement('div'))
-    .attr("id","card-print-overlay")
-    .html(multilineString(function() {
-  /*!
-<div id="card-print-dialog">
-  <div id="card-print-dialog-header">
-    <div id="card-print-dialog-title">Card Print</div>
-    <div id="buttons">
-      <input id="report-issue" type="button" class="aui-button" value="Report Issues" />
-      <input id="about" type="button" class="aui-button" value="About" />
-    </div>
-    </div>
-  <div id="card-print-dialog-content">
-    <iframe id="card-print-dialog-content-iframe"></iframe>
-  </div>
-  <div id="card-print-dialog-footer">
-    <input id="card-print-dialog-print" type="button" class="aui-button aui-button-primary" value="Print" />
-    <a id="card-print-dialog-cancel" title="Cancel" class="cancel">Cancel</a>
-  </div>
-</div>
-  */
-    }));
-    // info
-  
-    result.find("#report-issue")
-    .click(function(event){
-      window.open('https://github.com/qoomon/Jira-Issue-Card-Printer/issues');
-      return false;
-    });
-=======
-    
+
       //Attachment
       var hasAttachment = false;
       var indexOfPrintScopeDeviderToken =  description.indexOf(printScopeDeviderToken);
@@ -307,7 +234,7 @@
       } else{
         card.find('.attachment').addClass('hidden');
       }
-    
+
       //Story Points
       var storyPoints = data.fields.storyPoints;
       console.logDebug("storyPoints: " + storyPoints);
@@ -316,7 +243,7 @@
       } else {
         card.find(".estimate").addClass("hidden");
       }
-    
+
       //Epic
       var epicKey = data.fields.epicLink;
       console.logDebug("epicKey: " + epicKey);
@@ -330,21 +257,21 @@
       } else {
         card.find(".epic").addClass("hidden");
       }
-    
+
       //QR-Code
       var qrCodeImageUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=256x256&chld=L|1&chl=' + window.location.origin + "/browse/" + key;
       console.logTrace("qrCodeImageUrl: " + qrCodeImageUrl);
       card.find(".qr-code").css("background-image", "url('" + qrCodeImageUrl + "')");
-    
+
       //handle Site specifics
       switch (window.location.hostname) {
         case "lrs-support.com": fillCardWithJSONDataLRS(card, data);
         break;
         default:
         }
-    
+
       }
-    
+
       function fillCardWithJSONDataLRS(card, data) {
         console.logInfo("Apply LRS Specifics");
         //Desired-Date
@@ -358,10 +285,10 @@
           card.find(".due").addClass("hidden");
         }
       }
-    
-    
+
+
       function loadCardDataJSON(issueKey, callback) {
-    
+
         //https://docs.atlassian.com/jira/REST/latest/
         var url = '/rest/api/2/issue/' + issueKey + '?expand=renderedFields,names';
         console.logDebug("IssueUrl: " + window.location.hostname + url);
@@ -386,19 +313,19 @@
           data: {},
         });
       }
+
     
-    
-    
+
     //############################################################################################################################
     //############################################################################################################################
     //############################################################################################################################
-    
-    
+
+
     // http://www.cssdesk.com/T9hXg
-    
+
     function printOverlayHTML(){
-    
-    
+
+
       var result = jQuery(document.createElement('div'))
       .attr("id","card-print-overlay")
       .html(multilineString(function() {
@@ -423,57 +350,56 @@
     */
       }));
       // info
->>>>>>> gh-pages
-    
+
       result.find("#report-issue")
       .click(function(event){
         window.open('https://github.com/qoomon/Jira-Issue-Card-Printer/issues');
         return false;
       });
-      
+
        result.find("#about")
       .click(function(event){
         window.open('http://qoomon.blogspot.de/2014/01/jira-issue-card-printer-bookmarklet.html');
         return false;
       });
-    
+
       // print
-    
+
       result.find("#card-print-dialog-print")
       .click(function(event){
         print();
         return false;
       });
-    
+
       // closePrintPreview
-    
+
       result.find("#card-print-dialog-cancel")
       .click(function(event){
         closePrintPreview();
         return false;
       });
-    
+
       result.click(function(event) {
         if( event.target == this ){
           closePrintPreview();
         }
         return false;
       });
-    
+
       jQuery(document).keyup(function(e) {
         if (e.keyCode == 27) {  // esc
           closePrintPreview();
         }
       });
-    
+
       // prevent background scrolling
       result.scroll(function(event) {
         return false;
       });
-    
+
       return result;
     }
-    
+
     function printOverlayStyle(){
         var result = jQuery(document.createElement('style'))
         .attr("id", "card-print-overlay-style")
@@ -487,61 +413,61 @@
       top: 0;
       left: 0;
       background:rgba(0, 0, 0, 0.5);
-      
+
       box-sizing: border-box;
       word-wrap:break-word;
       z-index: 99999;
-     
+
     }
-    
+
     #card-print-dialog {
       position: relative;
-    
+
       top: 60px;
       right:0px;
       left:0px;
-      
+
       height: calc(100% - 120px);
       width: 1000px;
       margin: auto;
-      
+
       border-style: solid;
       border-color: #cccccc;
       border-width: 1px;
       -moz-border-radius: 4px;
       -webkit-border-radius: 4px;
       border-radius: 4px;
-      
+
       overflow: hidden;
     }
-    
+
     #card-print-dialog-header {
       position: relative;
       background: #f0f0f0;
       height: 25px;
-      
+
       border-bottom: 1px solid #cccccc;
-      
+
       padding: 15px 20px 15px 20px;
     }
-    
+
     #card-print-dialog-content {
       position: relative;
       background: white;
     height: calc(100% - 106px);		+  height: 100px;
-      width: 100%;		
-    	
-      overflow-y: scroll;		
-    }	
-    
-    #card-print-dialog-content-iframe {		
-      position: relative;		
-      height: 100%;		
       width: 100%;
-      
+
+      overflow-y: scroll;
+    }
+
+    #card-print-dialog-content-iframe {
+      position: relative;
+      height: 100%;
+      width: 100%;
+
       border:none;
     }
-    
+
     #card-print-dialog-footer {
       position: relative;
       background: #f0f0f0;
@@ -550,14 +476,14 @@
       padding: 10px;
       text-align: right;
     }
-    
+
     #buttons {
       position: relative;
       float: right;
       display: inline-block;
       height 30px;
     }
-    
+
     #info {
       position: absolute;
       right: 400px;
@@ -565,7 +491,7 @@
       display: inline-block;
       height 30px;
     }
-    
+
     #card-print-dialog-title{
       position: relative;
       float: left;
@@ -581,10 +507,10 @@
     }));
     return result;
     }
-    
-    
+
+
     function printPanelPageCSS(){
-    
+
       var result = jQuery(document.createElement('style'))
       .attr("id", "printPanelPageStyle")
       .attr("type", "text/css")
@@ -600,184 +526,60 @@
         min-width: 21cm;
         height: auto;
         page-break-after: always;
-    
+
         background:rgba(256, 256, 256, 0.85);
-    
+
         -webkit-box-shadow: 0px 0px 7px 3px rgba(31,31,31,0.4);
         -moz-box-shadow: 0px 0px 7px 3px rgba(31,31,31,0.4);
         box-shadow: 0px 0px 7px 3px rgba(31,31,31,0.4);
-    
+
         border-style: solid;
         border-color: #bfbfbf;
         border-width: 0.05cm;
         -moz-border-radius: 0.1cm;
         -webkit-border-radius: 0.1cm;
         border-radius: 0.1cm;
-    
+
         padding: 1.0cm;
         margin: 1.0cm;
-    
+
       }
-    
+
       @media print {
-    
+
       .page {
-    
-<<<<<<< HEAD
-    border:none;
-  }
-  
-  #card-print-dialog-footer {
-    position: relative;
-    background: #f0f0f0;
-    border-top: 1px solid #cccccc;
-    height: 30px;
-    padding: 10px;
-    text-align: right;
-  }
-  
-  #buttons {
-    position: relative;
-    float: right;
-    display: inline-block;
-    height 30px;
-  }
-  
-  #card-print-dialog-title{
-    position: relative;
-    float: left;
-    color: rgb(51, 51, 51);
-    display: block;
-    font-family: Arial, sans-serif;
-    font-size: 20px;
-    font-weight: normal;
-    height: 30px;
-    line-height: 30px;
-  }
-  */
-  }));
-  return result;
-  }
-  
-  
-  function printPanelPageCSS(){
-  
-    var result = jQuery(document.createElement('style'))
-    .attr("id", "printPanelPageStyle")
-    .attr("type", "text/css")
-    .html(multilineString(function() {
-      /*!
-      .page {
-      position: relative;
-      overflow: auto;
-      margin-left: auto;
-      margin-right: auto;
-      width: auto;
-      max-width: 29.7cm;
-      min-width: 21cm;
-      height: auto;
-=======
->>>>>>> gh-pages
+
       page-break-after: always;
-    
+
       background:rgba(256, 256, 256, 0.0);
       border-style: none;
       padding: 0.0cm;
       margin: 0.0cm;
-    
+
       -webkit-box-shadow: none;
       -moz-box-shadow: none;
       box-shadow: none;
-    
+
       -webkit-print-color-adjust:exact;
       print-color-adjust: exact;
-    
+
       -webkit-filter:opacity(1.0);
       filter:opacity(1.0);
     }
-<<<<<<< HEAD
-  
-    @media print {
-  
-    .page {
-  
-    page-break-after: always;
-  
-    background:rgba(256, 256, 256, 0.0);
-    border-style: none;
-    padding: 0.0cm;
-    margin: 0.0cm;
-  
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-  
-    -webkit-print-color-adjust:exact;
-    print-color-adjust: exact;
-  
-    -webkit-filter:opacity(1.0);
-    filter:opacity(1.0);
-  }
-  
-  .page:last-of-type {
-  page-break-after: auto;
-  }
-  }
-  */
-  }));
-  
-  return result;
-  }
-  
-  
-  // http://www.cssdesk.com/scHcP
-  
-  function newPage(issueKey){
-    var page = jQuery(document.createElement('div'))
-    .attr("id",issueKey)
-    .addClass("page")
-    .html(multilineString(function() {
-  /*!
-  <div class="card">
-    <div class="author">Bengt Brodersen - qoomon.com</div>
-    <div class="card-border"></div>
-    <div class="card-header">
-      <div class="type-icon badge circular"></div>
-      <div class="key badge"></div>
-      <div class="estimate badge circular"></div>
-      <div class="due">
-        <div class="due-icon badge circular "></div>
-        <div class="due-date badge"></div>
-      </div>
-    </div>
-    <div class="card-content">
-      <div class="content-header">
-        <span class="summary"></span>
-      </div>
-      <div class="description"></div>
-    </div>
-    <div class="card-footer">
-      <div class="assignee badge circular"></div>
-      <div class="qr-code badge"></div>
-      <div class="attachment badge circular"></div>
-      <div class="epic badge">
-        <span class="epic-key"></span>
-        <span class="epic-name"></span>
-=======
-    
+
     .page:last-of-type {
     page-break-after: auto;
     }
     }
     */
     }));
-    
+
     return result;
     }
-    
-    
+
+
     // http://www.cssdesk.com/scHcP
-    
+
     function newPage(issueKey){
       var page = jQuery(document.createElement('div'))
       .attr("id",issueKey)
@@ -799,7 +601,6 @@
       <div class="card-content">
         <div class="content-header">
           <span class="summary" contenteditable="true"></span>
->>>>>>> gh-pages
         </div>
         <div class="description" contenteditable="true"></div>
       </div>
@@ -815,10 +616,10 @@
     </div>
     */
       }));
-    
+
       return page;
     }
-    
+
     function printPanelCardCSS(){
       var result = jQuery(document.createElement('style'))
       .attr("type", "text/css")
@@ -834,15 +635,15 @@
     .hidden {
         visibility: hidden;
     }
-    .card-header:after, 
+    .card-header:after,
     .card-footer:after {
         content:" ";
         display: block;
         clear: both;
         height:0
     }
-    .card-border, 
-    .badge, 
+    .card-border,
+    .badge,
     .shadow {
         border-style: solid;
         border-color: #2f2f2f;
@@ -864,11 +665,11 @@
         height: 3.2cm;
         background: #d0d0d0;
     }
-    
+
     .card {
         position: relative;
         min-width: 21.0cm;
-       
+
     }
     .author {
         z-index: 999;
@@ -889,7 +690,7 @@
         right:0.4cm;
         height: calc(100% - 4.0cm);
         background: #ffffff;
-    
+
     }
     .card-header {
       position: relative;
@@ -946,7 +747,7 @@
         background-position: center;
         z-index: 1;
     }
-    
+
     .card[type="story"] .type-icon {
         background-color: GOLD;
         background-image: url(https://googledrive.com/host/0Bwgd0mVaLU_KU0N5b3JyRnJaNTA/resources/icons/Bulb.png);
@@ -959,7 +760,7 @@
         background-color: ROYALBLUE;
         background-image: url(https://googledrive.com/host/0Bwgd0mVaLU_KU0N5b3JyRnJaNTA/resources/icons/Flash.png);
     }
-    
+
     .estimate {
         position: relative;
         float: left;
@@ -974,7 +775,7 @@
         margin-top:1.5cm;
         z-index: 999;
     }
-    
+
     .due {
         position: relative;
         float: right;
@@ -1022,7 +823,7 @@
         -webkit-background-size: 70%;
         background-size: 70%;
         background-position: center;
-        
+
     }
     .assignee {
         position: relative;
@@ -1078,114 +879,114 @@
     }).replace(/{RESOURCE_ORIGIN}/g, resourceOrigin));
       return result;
     }
-    
+
     //############################################################################################################################
     //############################################################################################################################
     //############################################################################################################################
-    
+
     function appendScript(url, callback){
-    
+
       var head = document.getElementsByTagName('head')[0];
       var script = document.createElement('script');
       script.src = url;
-    
+
       // Then bind the event to the callback function.
       // There are several events for cross browser compatibility.
       script.onreadystatechange = callback;
       script.onload = callback;
-    
+
       head.appendChild(script);
     }
-    
+
     //############################################################################################################################
     //############################################################################################################################
     //############################################################################################################################
-    
+
     function addDeferred(deferredList){
       var deferred = new jQuery.Deferred()
       deferredList.push(deferred);
       return deferred;
     }
-    
+
     function applyDeferred(deferredList, callback){
       jQuery.when.apply(jQuery, deferredList).done(callback);
     }
-    
+
     //############################################################################################################################
     //############################################################################################################################
     //############################################################################################################################
-    
-    
+
+
     function addJQueryFunctions() {
       //jQuery Extention
       jQuery.expr[':']['is'] = function(node, index, props){
         return node.textContent == props[3];
       }
     }
-    
-    
+
+
     function addConsoleFunctions() {
-    
+
       console.ERROR = 0;
       console.WARN  = 1;
       console.INFO  = 2;
       console.DEBUG = 3;
       console.TRACE = 4;
-    
+
       console.logLevel = console.INFO ;
-    
+
       console.logError = function(msg){
         if(console.logLevel >= console.ERROR ) {
           console.log("ERROR: " + msg);
         }
       }
-    
+
       console.logWarn = function(msg){
         if(console.logLevel >= console.WARN ) {
           console.log("WARN:  " + msg);
         }
       }
-    
+
       console.logInfo = function(msg){
         if(console.logLevel >= console.INFO ) {
           console.log("INFO:  " + msg);
         }
       }
-    
+
       console.logDebug = function(msg){
         if(console.logLevel >= console.DEBUG ) {
           console.log("DEBUG: " + msg);
         }
       }
-    
+
       console.logTrace = function(msg){
         if(console.logLevel >= console.TRACE ) {
           console.log("TRACE: " + msg);
         }
       }
     }
-    
+
     function addStringFunctions() {
-    
+
       //trim string - remove leading and trailing whitespaces
       if (!String.prototype.trim) {
         String.prototype.trim = function() {
           return this.replace(/^\s+|\s+$/g, '');
         };
       }
-    
+
       if (!String.prototype.startsWith) {
         String.prototype.startsWith = function (str){
           return this.slice(0, str.length) == str;
         };
       }
-    
+
       if (!String.prototype.endsWith) {
         String.prototype.endsWith = function (str){
           return this.slice(-str.length) == str;
         };
       }
-    
+
       if (!String.prototype.toCamelCase) {
         String.prototype.toCamelCase = function() {
           // remove all characters that should not be in a variable name
@@ -1203,9 +1004,9 @@
         }
       }
     }
-    
+
     function addDateFunctions() {
-    
+
       Date.prototype.format = function(format) {
         var returnStr = '';
         var replace = Date.replaceChars;
@@ -1220,13 +1021,13 @@
       }
       return returnStr;
     };
-    
+
     Date.replaceChars = {
       shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       longMonths: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
       shortDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
       longDays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-    
+
       // Day
       d: function() { return (this.getDate() < 10 ? '0' : '') + this.getDate(); },
       D: function() { return Date.replaceChars.shortDays[this.getDay()]; },
@@ -1283,18 +1084,18 @@
         U: function() { return this.getTimep() / 1000; }
       };
     }
-    
+
     function multilineString(commentFunction) {
       return commentFunction.toString()
       .replace(/^[^\/]+\/\*!?/, '')
       .replace(/\*\/[^\/]+$/, '');
     }
-    
-    
+
+
     function resizeIframe(iframe) {
       iframe.height(iframe[0].contentWindow.document.body.scrollHeight);
     }
-  
+
   } catch (err) {
     console.logError(err.message);
     ga('send', 'exception', {
@@ -1303,4 +1104,3 @@
     });
   };
 })();
-
